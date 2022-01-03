@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Chart, ChartAxis, ChartGroup, ChartLine, ChartVoronoiContainer } from '@patternfly/react-charts';
 
 type PortfolioData = {
-    chartData: string
+    chartData: Array<Map<string, object>>
 }
 
 const PortfolioChart: React.FunctionComponent = ({ chartData }: PortfolioData) => (
@@ -28,12 +28,7 @@ const PortfolioChart: React.FunctionComponent = ({ chartData }: PortfolioData) =
         <ChartAxis dependentAxis showGrid tickValues={[2, 5, 8]} />
         <ChartGroup>
             <ChartLine
-                data={ [
-                    { name: chartData, x: '2015', y: 1},
-                    { name: chartData, x: '2016', y: 2},
-                    { name: chartData, x: '2017', y: 5},
-                    { name: chartData, x: '2018', y: 4}
-                ] }
+                data={ chartData }
             />
             <ChartLine
                 data={[
