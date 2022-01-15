@@ -6,3 +6,12 @@ export function accessibleRouteChangeHandler() {
     }
   }, 50);
 }
+
+export function dateToX(date, earliest) {
+  let delta = date.getTime()-earliest.getTime();
+  return delta/1440000;
+}
+
+export function xToDate(x, earliest) {
+  return new Date(x*1440000+earliest.getTime());
+}
