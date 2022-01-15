@@ -1,18 +1,83 @@
-# Patternfly Seed
+# stock-history
+A visualization tool for simulation of historical stock portfolio performance. 
 
-Patternfly Seed is an open source build scaffolding utility for web apps. The primary purpose of this project is to give developers a jump start when creating new projects that will use patternfly. A secondary purpose of this project is to serve as a reference for how to configure various aspects of an application that uses patternfly, webpack, react, typescript, etc.
+## Setup
+```
+git clone git@github.com:ethan-rambacher/stock-history.git
+pip install -r requirements.txt
+uvicorn server.main:app --reload
+```
 
-Out of the box you'll get an app layout with chrome (header/sidebar), routing, build pipeline, test suite, and some code quality tools. Basically, all the essentials.
-
-<img width="1058" alt="Out of box dashboard view of patternfly seed" src="https://user-images.githubusercontent.com/5942899/103803761-03a0a500-501f-11eb-870a-345d7d035e6b.png">
-
-## Quick-start
+## Quick Start
 
 ```bash
-git clone https://github.com/patternfly/patternfly-react-seed
-cd patternfly-react-seed
+git clone https://github.com/eerambach/stockistory
+cd stockistory
+pip install -r requirements.txt
+uvicorn server.main:app --reload
 npm install && npm run start:dev
 ```
+
+## APIs
+### Serve static tool file
+Serves `/static` folder to `/static` endpoint
+### Passthrough API to finance API
+Portfolio holdings are represented as the following data structure:
+```
+{
+    "investments": [
+        {
+            "ticker": "AAPL",
+            "startDate": "1/31/2000",
+            "endDate": "5/1/2001",
+            "frequency": "weekly"
+        },
+        {
+            "ticker": "VLCAX",
+            "startDate": "3/20/2005",
+            "endDate": "3/25/2005",
+            "frequency": "daily"
+        }
+    ]
+}
+```
+This data structure is returned, amended with price information:
+```
+{
+    "investments": [
+        {
+            "ticker": "AAPL",
+            "prices": [
+                {
+                    "date": "1/31/2000",
+                    "price": 100
+                },
+                {
+                    "date": "2/6/2000",
+                    "price": 200
+                },
+                ...
+            ],
+            "dividends": [
+                {
+                    "date": "3/1/2000",
+                    "amount": 0.3
+                },
+                ...
+            ],
+        },
+        {
+            "ticker": "VLCAX",
+            "prices": [
+                ...
+            ]
+        }
+    ]
+}
+```
+
+The API endpoint is accessed using `GET /holdings`.
+
 ## Development scripts
 ```sh
 # Install development/build dependencies
@@ -90,13 +155,7 @@ body {
 ## Adding custom CSS
 When importing CSS from a third-party package for the first time, you may encounter the error `Module parse failed: Unexpected token... You may need an appropriate loader to handle this file typ...`. You need to register the path to the stylesheet directory in [stylePaths.js](./stylePaths.js). We specify these explicity for performance reasons to avoid webpack needing to crawl through the entire node_modules directory when parsing CSS modules.
 
-## Code quality tools
-* For accessibility compliance, we use [react-axe](https://github.com/dequelabs/react-axe)
-* To keep our bundle size in check, we use [webpack-bundle-analyzer](https://github.com/webpack-contrib/webpack-bundle-analyzer)
-* To keep our code formatting in check, we use [prettier](https://github.com/prettier/prettier)
-* To keep our code logic and test coverage in check, we use [jest](https://github.com/facebook/jest)
-* To ensure code styles remain consistent, we use [eslint](https://eslint.org/)
-* To provide a place to showcase custom components, we integrate with [storybook](https://storybook.js.org/)
+
 
 ## Multi environment configuration
 This project uses [dotenv-webpack](https://www.npmjs.com/package/dotenv-webpack) for exposing environment variables to your code. Either export them at the system level like `export MY_ENV_VAR=http://dev.myendpoint.com && npm run start:dev` or simply drop a `.env` file in the root that contains your key-value pairs like below:

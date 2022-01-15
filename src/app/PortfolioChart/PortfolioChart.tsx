@@ -1,50 +1,73 @@
 import * as React from 'react';
 import { Chart, ChartAxis, ChartGroup, ChartLine, ChartVoronoiContainer } from '@patternfly/react-charts';
+//import { VictoryZoomContainer } from 'victory-zoom-container';
+import { scaleDiscontinuous, discontinuityRange } from 'd3fc-discontinuous-scale';
 
 type PortfolioData = {
-    chartData: Array<Map<string, object>>
+    symbols: string[]
+    data: any[][]
 }
 
-const PortfolioChart: React.FunctionComponent = ({ chartData }: PortfolioData) => (
-    <Chart
-        ariaDesc="Average number of pets"
-        ariaTitle="Line chart example"
-        containerComponent={<ChartVoronoiContainer labels={({ datum }) => `${datum.name}: ${datum.y}`} constrainToVisibleArea />}
-        legendData={[{ name: 'Cats' }, { name: 'Dogs', symbol: { type: 'dash' } }, { name: 'Birds' }, { name: 'Mice' }]}
-        legendOrientation="vertical"
-        legendPosition="right"
-        height={250}
-        maxDomain={{ y: 10 }}
-        minDomain={{ y: 0 }}
-        padding={{
-            bottom: 50,
-            left: 50,
-            right: 200, // Adjusted to accommodate legend
-            top: 50
-        }}
-        width={600}
-    >
-        <ChartAxis tickValues={[2, 3, 4]} />
-        <ChartAxis dependentAxis showGrid tickValues={[2, 5, 8]} />
-        <ChartGroup>
-            <ChartLine
-                data={ chartData }
-            />
-            <ChartLine
-                data={[
-                    { name: 'Dogs', x: '2015', y: 2 },
-                    { name: 'Dogs', x: '2016', y: 1 },
-                    { name: 'Dogs', x: '2017', y: 7 },
-                    { name: 'Dogs', x: '2018', y: 4 }
-                ]}
-                style={{
-                    data: {
-                        strokeDasharray: '3,3'
-                    }
+type PortfolioState = {
+    prices: { [key: string]: any[][] }
+}
+
+function selectN(list: any[], n: number) {
+    // note: this returns APPROXIMATELY n evenly spaced items from `list`
+    const k: number = Math.floor(list.length / n);
+    return list.filter((_, index) => index % k == 0);
+}
+
+export default class PortfolioChart extends React.Component<PortfolioData, PortfolioState> {
+    state: PortfolioState = {
+        prices: {}
+    };
+
+    render() {
+        console.log("rendering portfoliochart with props:");
+        console.log(this.props.symbols);
+        console.log(this.props.data);
+
+        return (
+            <Chart
+                ariaDesc="Average number of pets"
+                ariaTitle="Line chart example"
+                containerComponent={<ChartVoronoiContainer labels={({ datum }) => `${datum[0].toDateString()}`} constrainToVisibleArea />}
+                legendData={this.props.symbols.map((s) => ({ name: s }))}
+                legendOrientation="vertical"
+                legendPosition="right"
+                height={250}
+                padding={{
+                    bottom: 50,
+                    left: 50,
+                    right: 200, // Adjusted to accommodate legend
+                    top: 50
                 }}
-            />
-        </ChartGroup>
-    </Chart>
-)
+                scale={{x: "time", y: "linear"}}
+                width={600}
+            >
+                <ChartAxis fixLabelOverlap/>
+                <ChartAxis dependentAxis showGrid orientation="left"/>
+                <ChartGroup>
+                    {/* <ChartLine key="A" data={[[2,2],[1,3],[3,4]]} x={0} y={1} />
+                    <ChartLine key="B" data={[[1,3],[2,4],[1]]} x={0} y={1} /> */}
+                    {
+                        this.props.symbols.map((symbol) => {
+                            return (
+                                <ChartLine
+                                    key={symbol}
+                                    data={this.props.data}
+                                    //labels={}
+                                    x={0}
+                                    y={(arr) => arr[2][symbol][0]}
+                                />
+                            )
+                        })
+                    }
+                </ChartGroup>
+            </Chart>
+        )
+    }
+}
 
 export { PortfolioChart };
